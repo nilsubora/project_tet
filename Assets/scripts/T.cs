@@ -13,65 +13,41 @@ public class T : MonoBehaviour
 
     public Vector3 rotationpoint;
 
-    // private string touch;
-    //  private string grounding;
-    /*
-      public void OnTriggerEnter2D(Collider2D other)
-      {
-          if (other.tag == "leftwall")
-          {
-              touch = "left";
-          }
-          else if (other.tag == "rightwall")
-          {
-              touch = "right";
-          }
-          else if (other.tag == "bottom")
-          {
-              grounding = "bottom";
-              Invoke("changebodytype", 2.5f); 
-              //changebodytype();
-              print(GetComponent<Rigidbody2D>().bodyType);
-              FindObjectOfType<spawnpoint>().newblock();
-          }
-      }
-
-      */
-    /*
-    public void OnTriggerExit2D(Collider2D other)
-    {
-        if (other.tag == "leftwall" || other.tag == "rigthwall")
-        {
-            touch = "";
-        }
-    }
-    
-    */
-
     void Start()
     {
 
     }
     private static Transform[,] grid = new Transform[width, heigth];
-    //void addtogrid()
-   // {
-     //   foreach (Transform children)
-    //}
-    bool validmove()
+    void Addtogrid()
     {
         foreach (Transform children in transform)
         {
             int roundedX = Mathf.RoundToInt(children.transform.position.x);
             int roundedY = Mathf.RoundToInt(children.transform.position.y);
 
-            if ( roundedX < 0 || roundedX > width || roundedY < 0 )
+            grid[roundedX, roundedY] = children;
+        }
+    }
+
+    bool Validmove()
+    {
+        foreach (Transform children in transform)
+        {
+            int roundedX = Mathf.RoundToInt(children.transform.position.x);
+            int roundedY = Mathf.RoundToInt(children.transform.position.y);
+
+            if ( roundedX < 0 || roundedX >= width || roundedY < 0 )
+            {
+                return false;
+            }
+            if (grid[roundedX,roundedY] != null)
             {
                 return false;
             }
         }
         return true;
     }
-    void öncekinidurdurma()
+    void Stoptheprevious()
     {
         this.enabled = false;
     }
@@ -84,11 +60,12 @@ public class T : MonoBehaviour
         {
             transform.position += new Vector3(0, -1, 0);
             previousTime = Time.time;
-            if (!validmove())
+            if (!Validmove())
             {
                 transform.position -= new Vector3(0, -1, 0);
-                // yield return new WaitForSeconds(1);
-                Invoke("öncekinidurdurma", 3.0f);
+                Addtogrid();
+            //    Debug.Log(grid);
+                Invoke("Stoptheprevious", 3.0f);
                 this.enabled = false;
                 FindObjectOfType<spawnpoint>().newblock();
             }
@@ -97,29 +74,27 @@ public class T : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.RightArrow))
         {
-            // if (touch != "right" || validmove() == true)
+
             transform.position += new Vector3(1, 0, 0);
-            if (!validmove())
+            if (!Validmove())
             {
                 transform.position += new Vector3(-1, 0, 0);
             }
         }
         if(Input.GetKeyDown(KeyCode.LeftArrow))
         {
-            // if (touch != "left" || validmove() == true)
             transform.position += new Vector3(-1, 0, 0);
-            if (!validmove())
+            if (!Validmove())
             {
                 transform.position += new Vector3(1, 0, 0);
-               // print(validmove());
-               // print(touch);
+
             }      
         }
         
         if(Input.GetKeyDown(KeyCode.Space))
         {
             transform.RotateAround(transform.TransformPoint(rotationpoint), new Vector3(0, 0, 1), 90);
-            if (!validmove())
+            if (!Validmove())
             {
                 transform.RotateAround(transform.TransformPoint(rotationpoint), new Vector3(0, 0, 1), -90);
             }
