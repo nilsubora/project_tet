@@ -10,14 +10,28 @@ public class T : MonoBehaviour
     public float fallTime = 0.8f;
     public static int height = 20;
     public static int width = 10;
-
+    private static Transform[,] grid = new Transform[width + 2, height + 2];
     public Vector3 rotationpoint;
+
+
 
     void Start()
     {
-
+        Boundarycheck();
     }
-    private static Transform[,] grid = new Transform[width+1, height+1];
+    
+    void Boundarycheck()
+    {
+        GameObject Boundary = GameObject.Find("boundary");
+        int boun = Boundary.transform.childCount;
+        for(int i=0; i < boun; i++)
+        {
+            int roundedX = Mathf.RoundToInt(Boundary.transform.GetChild(i).transform.position.x);
+            int roundedY = Mathf.RoundToInt(Boundary.transform.GetChild(i).transform.position.y);
+            grid[roundedX, roundedY] = Boundary.transform.GetChild(i);
+        }
+    }
+    
     void Addtogrid()
     {
         foreach (Transform children in transform)
@@ -36,10 +50,10 @@ public class T : MonoBehaviour
             int roundedX = Mathf.RoundToInt(children.transform.position.x);
             int roundedY = Mathf.RoundToInt(children.transform.position.y);
 
-            if ( roundedX < 0 || roundedX >= width || roundedY < 0 )
-            {
-                return false;
-            }
+            //if ( roundedX < 0 || roundedX >= width || roundedY < 0 )
+           //{
+            //    return false;
+           // }
             if (grid[roundedX,roundedY] != null)
             {
                 return false;
@@ -108,6 +122,7 @@ public class T : MonoBehaviour
 
     void Update()
     {
+        Debug.Log(transform.position.x);
         Checklines();
         if (Time.time - previousTime > ((Input.GetKeyDown(KeyCode.DownArrow))?fallTime/10:fallTime))
         {
