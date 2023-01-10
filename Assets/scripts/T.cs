@@ -10,21 +10,27 @@ public class T : MonoBehaviour
     public float fallTime = 0.8f;
     public static int height = 20;
     public static int width = 10;
-
+    private static Transform[,] grid = new Transform[width + 2, height + 2];
     public Vector3 rotationpoint;
 
     void Start()
     {
-
+        GameObject bound = GameObject.Find("boundary");
+        int boundcount = bound.transform.childCount;
+        for(int i = 0; i < boundcount; i++)
+        {
+            int roundedX = Mathf.RoundToInt(bound.transform.GetChild(i).position.x);
+            int roundedY = Mathf.RoundToInt(bound.transform.GetChild(i).position.y);
+            grid[roundedX, roundedY] = bound.transform.GetChild(i);
+        }
     }
-    private static Transform[,] grid = new Transform[width+1, height+1];
+
     void Addtogrid()
     {
         foreach (Transform children in transform)
         {
             int roundedX = Mathf.RoundToInt(children.transform.position.x);
             int roundedY = Mathf.RoundToInt(children.transform.position.y);
-
             grid[roundedX, roundedY] = children;
         }
     }
@@ -36,10 +42,10 @@ public class T : MonoBehaviour
             int roundedX = Mathf.RoundToInt(children.transform.position.x);
             int roundedY = Mathf.RoundToInt(children.transform.position.y);
 
-            if ( roundedX < 0 || roundedX >= width || roundedY < 0 )
+           /* if ( roundedX < 0 || roundedX >= width || roundedY < 0 )
             {
                 return false;
-            }
+            }*/
             if (grid[roundedX,roundedY] != null)
             {
                 return false;
@@ -108,6 +114,14 @@ public class T : MonoBehaviour
 
     void Update()
     {
+        foreach (Transform children in transform)
+        {
+            int roundedX = Mathf.RoundToInt(children.transform.position.x);
+            int roundedY = Mathf.RoundToInt(children.transform.position.y);
+            Debug.Log(roundedX);
+        }
+
+
         Checklines();
         if (Time.time - previousTime > ((Input.GetKeyDown(KeyCode.DownArrow))?fallTime/10:fallTime))
         {
